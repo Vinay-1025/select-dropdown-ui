@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Write — Inline Select Dropdown</title>
+    <meta name="description"
+        content="Fluen Vocabulary with direct inline select dropdowns, unique selection auto-hiding, and zero target-box clutter." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-header: #474a52;
+            --bg-canvas: #26272b;
+            --bg-card: #2e3036;
+            --bg-slot: #38393f;
+            --bg-slot-hover: #43454c;
+            --border-slot: rgba(255, 255, 255, 0.12);
+
+            --text-main: #ffffff;
+            --text-sub: #d5d7dc;
+            --text-muted: #8e929b;
+
+            --link-blue: #5ca5e6;
+            --progress-blue: #5ca5e6;
+            --progress-gold: #8d7339;
+
+            --btn-orange: #f16521;
+            --btn-orange-hover: #e05512;
+            --btn-blue: #0a74ba;
+            --btn-blue-hover: #0863a0;
+
+            --correct-bg: rgba(16, 185, 129, 0.2);
+            --correct-border: #10b981;
+            --correct-text: #34d399;
+
+            --error-bg: rgba(239, 68, 68, 0.2);
+            --error-border: #ef4444;
+            --error-text: #f87171;
+
+            --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            font-family: var(--font);
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        .app-viewport {
+            max-width: 540px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-canvas);
+            position: relative;
+        }
+
+        /* ====== STATUS BAR SIMULATION ====== */
+        .status-bar-sim {
+            height: 18px;
+            background: var(--bg-header);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 14px 0;
+            font-size: 10px;
+            font-weight: 600;
+            color: #b0b3ba;
+        }
+
+        .status-bar-sim .icons {
+            display: flex;
+            gap: 5px;
+            font-size: 9px;
+        }
+
+        /* ====== TOP APP HEADER (Exact Screenshot Match) ====== */
+        .top-header {
+            background: var(--bg-header);
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon-circle {
+            width: 38px;
+            height: 38px;
+            background: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+            flex-shrink: 0;
+        }
+
+        .header-icon-circle svg {
+            width: 22px;
+            height: 22px;
+            fill: #1a1a1a;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.01em;
+        }
+
+        /* 4-Color Logo Badge from Screenshot */
+        .app-logo-badge {
+            width: 26px;
+            height: 26px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            padding: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .app-logo-badge span {
+            border-radius: 2px;
+        }
+
+        .app-logo-badge .c-orange {
+            background: #f26522;
+        }
+
+        .app-logo-badge .c-green {
+            background: #42b883;
+        }
+
+        .app-logo-badge .c-red {
+            background: #ea580c;
+        }
+
+        .app-logo-badge .c-blue {
+            background: #00aeef;
+        }
+
+        /* Progress Divider Line (Split Blue & Gold) */
+        .header-progress-line {
+            height: 3px;
+            width: 100%;
+            display: flex;
+            background: var(--progress-gold);
+        }
+
+        .header-progress-line .blue-fill {
+            height: 100%;
+            width: 60%;
+            background: var(--progress-blue);
+            transition: width 0.4s ease;
+        }
+
+        /* ====== MAIN CONTENT (Zero Target-Box Clutter) ====== */
+        .main-content {
+            flex: 1;
+            padding: 16px 18px 90px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Breadcrumbs: Module 3 >> Topics >> Topic 2 */
+        .breadcrumb-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--link-blue);
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .breadcrumb-link {
+            color: var(--link-blue);
+            text-decoration: underline;
+        }
+
+        .breadcrumb-sep {
+            color: var(--link-blue);
+            font-size: 11px;
+        }
+
+        .breadcrumb-current {
+            color: var(--link-blue);
+        }
+
+        /* Practice Heading */
+        .practice-heading-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .practice-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.01em;
+        }
+
+        .set-selector-btn {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--link-blue);
+            background: rgba(92, 165, 230, 0.12);
+            border: 1px solid rgba(92, 165, 230, 0.3);
+            padding: 4px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Questions & Bullets (Exact Screenshot Match) */
+        .questions-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .q-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .q-header {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f1f3f5;
+            line-height: 1.45;
+        }
+
+        .q-bullets {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding-left: 4px;
+        }
+
+        .bullet-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            font-size: 14.5px;
+            color: var(--text-sub);
+            line-height: 2.2;
+        }
+
+        .bullet-dot {
+            color: var(--text-sub);
+            font-size: 16px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .bullet-text {
+            flex: 1;
+            font-size: 14.5px;
+            color: var(--text-sub);
+        }
+
+        /* ====== DIRECT INLINE SELECT DROPDOWN (Replacing Target Box) ====== */
+        .inline-dropdown-container {
+            display: inline-block;
+            position: relative;
+            margin: 0 4px;
+            vertical-align: middle;
+        }
+
+        .dropdown-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-slot);
+            border: 1px solid var(--border-slot);
+            border-radius: 7px;
+            padding: 3px 10px;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #e5e7eb;
+            min-width: 132px;
+            height: 32px;
+            justify-content: center;
+            user-select: none;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .dropdown-trigger:hover {
+            background: var(--bg-slot-hover);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .dropdown-trigger.open {
+            border-color: var(--link-blue);
+            box-shadow: 0 0 0 2px rgba(92, 165, 230, 0.35);
+            background: #3e4149;
+        }
+
+        .dropdown-trigger.filled {
+            color: #ffffff;
+            font-weight: 700;
+            background: #373d4a;
+            border-color: var(--link-blue);
+            padding-right: 28px;
+        }
+
+        .dropdown-trigger.correct {
+            background: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--correct-text);
+        }
+
+        .dropdown-trigger.incorrect {
+            background: var(--error-bg);
+            border-color: var(--error-border);
+            color: var(--error-text);
+        }
+
+        .dropdown-caret {
+            font-size: 11px;
+            color: #b0b3ba;
+            pointer-events: none;
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown-trigger.open .dropdown-caret {
+            transform: rotate(180deg);
+            color: var(--link-blue);
+        }
+
+        .dropdown-clear-btn {
+            position: absolute;
+            right: 6px;
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .dropdown-clear-btn:hover {
+            background: var(--btn-orange);
+        }
+
+        /* Dropdown Options Menu Attached Directly Below the Select */
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            z-index: 200;
+            background: #2d2f36;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 9px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+            padding: 5px;
+            min-width: 175px;
+            max-width: 260px;
+            display: none;
+            flex-direction: column;
+            gap: 3px;
+            animation: menuSlideDown 0.16s ease-out;
+        }
+
+        @keyframes menuSlideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-menu.active {
+            display: flex;
+        }
+
+        .dropdown-menu-header {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 3px 8px 3px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 2px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .dropdown-item {
+            padding: 8px 12px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #ffffff;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.12s, color 0.12s;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(92, 165, 230, 0.2);
+            color: var(--link-blue);
+        }
+
+        .dropdown-item.selected {
+            background: rgba(92, 165, 230, 0.18);
+            color: var(--link-blue);
+            font-weight: 700;
+        }
+
+        .dropdown-item-reset {
+            color: var(--btn-orange);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 3px;
+            font-weight: 700;
+        }
+
+        .dropdown-item-reset:hover {
+            background: rgba(241, 101, 33, 0.15);
+            color: #ff7836;
+        }
+
+        /* ====== BOTTOM ACTION BUTTONS (Exact Match: Orange Prev & Blue Next) ====== */
+        .bottom-cta-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 540px;
+            height: 58px;
+            background: var(--bg-canvas);
+            padding: 6px 14px 10px;
+            display: flex;
+            gap: 4px;
+            z-index: 100;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-prev {
+            flex: 1;
+            height: 44px;
+            border: none;
+            border-radius: 8px 0 0 8px;
+            background: var(--btn-orange);
+            color: #ffffff;
+            font-family: var(--font);
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .btn-prev:hover {
+            background: var(--btn-orange-hover);
+        }
+
+        .btn-next {
+            flex: 1;
+            height: 44px;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            background: var(--btn-blue);
+            color: #ffffff;
+            font-family: var(--font);
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .btn-next:hover {
+            background: var(--btn-blue-hover);
+        }
+
+        /* ====== EXERCISE SWITCHER MODAL ====== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 300;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-sheet {
+            width: 100%;
+            max-width: 540px;
+            background: var(--bg-card);
+            border-radius: 16px 16px 0 0;
+            padding: 18px 20px 24px;
+            max-height: 75vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .modal-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
+
+        .modal-exercise-row {
+            padding: 12px 14px;
+            background: var(--bg-slot);
+            border-radius: 8px;
+            border: 1px solid var(--border-slot);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-exercise-row.active {
+            border-color: var(--link-blue);
+            background: rgba(92, 165, 230, 0.15);
+        }
+
+        .modal-ex-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .modal-ex-info {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Confetti Particle */
+        .confetti-particle {
+            position: fixed;
+            z-index: 400;
+            pointer-events: none;
+            animation: confettiFall 2.4s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-viewport">
+        <!-- Status Bar Simulation -->
+        <div class="status-bar-sim">
+            <span>3:10</span>
+            <div class="icons">
+                <span>📶</span>
+                <span>5G</span>
+                <span>76%</span>
+            </div>
+        </div>
+
+        <!-- Top App Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="header-icon-circle" title="Writing Practice">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M2.5 19.5l4-1 10.5-10.5-3-3L3.5 15.5l-1 4zm14.7-13.8l1.6-1.6c.4-.4 1-.4 1.4 0l1.6 1.6c.4.4.4 1 0 1.4l-1.6 1.6-3-3zM21 21H3c-.6 0-1-.4-1-1s.4-1 1-1h18c.6 0 1 .4 1 1s-.4 1-1 1z" />
+                    </svg>
+                </div>
+                <span class="header-title">Write</span>
+            </div>
+            <div class="header-right">
+                <div class="app-logo-badge" onclick="openExerciseModal()" title="Switch Exercise">
+                    <span class="c-orange"></span>
+                    <span class="c-green"></span>
+                    <span class="c-red"></span>
+                    <span class="c-blue"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Split Progress Divider Line -->
+        <div class="header-progress-line">
+            <div class="blue-fill" id="headerProgressFill"></div>
+        </div>
+
+        <!-- Main Content Area: Zero target-box clutter, pure inline select dropdowns -->
+        <main class="main-content">
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumb-row" onclick="openExerciseModal()">
+                <span class="breadcrumb-link">Module 3</span>
+                <span class="breadcrumb-sep">&gt;&gt;</span>
+                <span class="breadcrumb-link">Topics</span>
+                <span class="breadcrumb-sep">&gt;&gt;</span>
+                <span class="breadcrumb-current" id="topicBreadcrumb">Topic 2</span>
+            </nav>
+
+            <!-- Practice Heading -->
+            <div class="practice-heading-wrap">
+                <h1 class="practice-title" id="practiceTitle">Practice 2</h1>
+                <button class="set-selector-btn" onclick="openExerciseModal()">
+                    <span id="setIndexBadge">Set 2 / 10</span>
+                    <span>▾</span>
+                </button>
+            </div>
+
+            <!-- All Questions Rendered At Once with Direct Dropdowns -->
+            <div class="questions-wrapper" id="questionsContainer">
+                <!-- Rendered dynamically -->
+            </div>
+        </main>
+
+        <!-- Bottom CTA Bar (Exact Match: Orange Prev & Blue Next) -->
+        <footer class="bottom-cta-bar">
+            <button class="btn-prev" id="btnPrev" onclick="onPrevClick()">
+                <span>&lt; Prev</span>
+            </button>
+            <button class="btn-next" id="btnNext" onclick="onNextClick()">
+                <span id="nextBtnText">Next &gt;</span>
+            </button>
+        </footer>
+    </div>
+
+    <!-- Exercise Switcher Modal -->
+    <div class="modal-overlay" id="exerciseModal" onclick="closeExerciseModal(event)">
+        <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div class="modal-title-row">
+                <span class="modal-title">Select Practice Topic</span>
+                <button class="modal-close-btn" onclick="closeExerciseModal()">✕</button>
+            </div>
+            <div class="modal-items-list" id="modalItemsList">
+                <!-- Exercise list injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================================
+           DATASET: 10 EXERCISES
+           ========================================================= */
+        const DATASET = [
+
+            {
+                id: 'p1',
+                type: 'passage',
+                title: 'Practice 1: Observing the head teacher',
+                breadcrumbTopic: 'Topic 1',
+                instructions: '1. Read the passage and choose the most appropriate terms to complete the sentences.',
+                text: 'Today, I watched a busy day at our preschool. The head teacher held a $select$ meeting to plan the daily schedule. $select$ helped decide what the children would learn. The teachers used $select$ to watch how each child was growing. In the afternoon, $select$ helped them choose activities for free play. The helpers prepared materials for $select$. The head teacher also checked $select$ to make sure every child played outside.',
+                options: ['observation', 'art and craft', 'outdoor play', 'staff', 'lesson planning', 'activity planning'],
+                correct_options: ['staff', 'lesson planning', 'observation', 'activity planning', 'art and craft', 'outdoor play']
+            },
+            {
+                id: 'p2',
+                type: 'passage',
+                title: 'Practice 3: A day in the play area',
+                breadcrumbTopic: 'Topic 3',
+                instructions: '1. Choose the appropriate terms to complete the observations.',
+                text: 'The children started their morning with $select$, choosing their own toys. Good $select$ helped them run and jump safely. Teachers taught children to wait for their turn, which is called $select$. A separate corner helped strengthen their $select$ using small blocks and crayons. In the afternoon, all the children enjoyed a $select$ together. Finally, $select$ helped them put away the toys before snack time.',
+                options: ['turn taking', 'group activity', 'clean up time', 'free play', 'motor skills', 'fine motor skills'],
+                correct_options: ['free play', 'motor skills', 'turn taking', 'fine motor skills', 'group activity', 'clean up time']
+            },
+            {
+                id: 'p3',
+                type: 'passage',
+                title: 'Practice 4: Cultural activities',
+                breadcrumbTopic: 'Topic 4',
+                instructions: '1. Select the suitable cultural vocabulary for each blank.',
+                text: 'The teachers planned activities for the week. They began with $select$, where children sang and clapped. A $select$ was held to tell stories about animals. The children prepared a $select$ for the upcoming festival. They also had a $select$ where children wore simple costumes. A $select$ was organised where children brought fruits from home. The teachers also prepared for $select$ with running and jumping games.',
+                options: ['group dance', 'fruit day', 'sports day', 'rhyme time', 'story session', 'dress up'],
+                correct_options: ['rhyme time', 'story session', 'group dance', 'dress up', 'fruit day', 'sports day']
+            },
+            {
+                id: 's1',
+                type: 'grouped_sentences',
+                title: 'Practice 5: Sentence Completion',
+                breadcrumbTopic: 'Topic 5',
+                groups: [
+                    {
+                        heading: '1. Select the correct vocabulary word for the educational setting.',
+                        sentences: [
+                            'The head teacher will $select$ the new helper to our nursery team.',
+                            'The parents agreed that the children\'s $select$ in the annual day was wonderful.'
+                        ],
+                        options: ['appoint', 'performance', 'dismiss', 'prose'],
+                        answers: ['appoint', 'performance']
+                    },
+                    {
+                        heading: '2. Select the right words to complete the sentences.',
+                        sentences: [
+                            'Rohan says he cannot $select$ the invitation to the school picnic.',
+                            'The heavy rain resulted in $select$ damage to the playground.',
+                            'The school bus $select$ arrives late during bad weather.'
+                        ],
+                        options: ['accept', 'extensive', 'always', 'access', 'extension'],
+                        answers: ['accept', 'extensive', 'always']
+                    }
+                ]
+            },
+            {
+                id: 'p4',
+                type: 'passage',
+                title: 'Practice 6: Sports Day',
+                breadcrumbTopic: 'Topic 6',
+                instructions: '1. Choose the right terms to describe the Sports Day timeline.',
+                text: 'The Sports Day began with $select$, where children folded their hands. Then all the children did $select$ to get ready for the races. The little ones took part in $select$ like running and hopping. $select$ helped the teachers manage the children during the events. After all the races, there was a $select$ where winners received medals. The day ended with a $select$, where everyone sang together before going home.',
+                options: ['race practice', 'prize distribution', 'group song', 'parent volunteers', 'opening prayer', 'warm up'],
+                correct_options: ['opening prayer', 'warm up', 'race practice', 'parent volunteers', 'prize distribution', 'group song']
+            },
+            {
+                id: 'p5',
+                type: 'passage',
+                title: 'Practice 7: Morning routine',
+                breadcrumbTopic: 'Topic 7',
+                instructions: '1. Fill in the sequence of routine events in the classroom.',
+                text: 'The day started with $select$, where children folded their hands and closed their eyes. The teacher marked $select$ by calling each child\'s name. After that, children had $select$ where they ate biscuits or fruits. Then they went for $select$ to run and play in the open area. The teacher read a book during $select$. Before going home, everyone sat in a $select$ and sang a goodbye song.',
+                options: ['snack time', 'story session', 'goodbye circle', 'outdoor play', 'morning prayer', 'attendance'],
+                correct_options: ['morning prayer', 'attendance', 'snack time', 'outdoor play', 'story session', 'goodbye circle']
+            },
+            {
+                id: 's3',
+                type: 'grouped_sentences',
+                title: 'Practice 8: Advanced Vocabulary',
+                breadcrumbTopic: 'Topic 8',
+                groups: [
+                    {
+                        heading: '1. Choose the verb that best fits each formal context.',
+                        sentences: [
+                            'We were asked to $select$ the children\'s artwork carefully.',
+                            'The teachers need to $select$ their storytelling skills.'
+                        ],
+                        options: ['analyse', 'improve', 'advertise', 'process'],
+                        answers: ['analyse', 'improve']
+                    },
+                    {
+                        heading: '2. Select the appropriate administrative action.',
+                        sentences: [
+                            'The senior teacher will $select$ the children\'s progress before the parent meeting.',
+                            'The new teacher forgot to $select$ the parents about the holiday.',
+                            'The picnic plan was $select$ by the school principal.'
+                        ],
+                        options: ['evaluate', 'inform', 'approved', 'elevate', 'send'],
+                        answers: ['evaluate', 'inform', 'approved']
+                    }
+                ]
+            },
+            {
+                id: 's4',
+                type: 'grouped_sentences',
+                title: 'Practice 9: Decision Making',
+                breadcrumbTopic: 'Topic 9',
+                groups: [
+                    {
+                        heading: '1. Complete each collaborative task sentence.',
+                        sentences: [
+                            'The class teacher will $select$ the craft work among the children.',
+                            'We had to $select$ the activity schedule due to a holiday.'
+                        ],
+                        options: ['delegate', 'revise', 'shift', 'reverse'],
+                        answers: ['delegate', 'revise']
+                    },
+                    {
+                        heading: '2. Complete the policy formulation sentences.',
+                        sentences: [
+                            'The nursery team will $select$ the monthly learning outcomes today.',
+                            'They decided to $select$ a new teaching method for better learning.'
+                        ],
+                        options: ['discuss', 'adopt', 'understand', 'affect'],
+                        answers: ['discuss', 'adopt']
+                    }
+                ]
+            },
+            {
+                id: 's5',
+                type: 'grouped_sentences',
+                title: 'Practice 10: Strategic Analysis',
+                breadcrumbTopic: 'Topic 10',
+                groups: [
+                    {
+                        heading: '1. Complete the professional evaluations.',
+                        sentences: [
+                            'The workshop on storytelling was extremely $select$.',
+                            'Our team must $select$ closely with the parents and helpers.'
+                        ],
+                        options: ['insightful', 'collaborate', 'interaction', 'contract'],
+                        answers: ['insightful', 'collaborate']
+                    },
+                    {
+                        heading: '2. Complete the analytical reporting.',
+                        sentences: [
+                            'The market research revealed a $select$ in consumer interest.',
+                            'The analyst used various tools to $select$ data from different sources.'
+                        ],
+                        options: ['decline', 'collect', 'delay', 'protect'],
+                        answers: ['decline', 'collect']
+                    }
+                ]
+            }
+        ];
+
+        /* =========================================================
+           STATE MANAGEMENT
+           ========================================================= */
+        let currentExerciseIndex = 0;
+        let openDropdownIdx = -1;
+        let userAnswers = {}; // { [blankIndex]: word }
+        let blankMeta = [];
+        let isEvaluated = false;
+
+        // Web Audio Synthesizer
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        function playSnd(f = 600, type = 'sine', d = 0.08) {
+            try {
+                if (!audioCtx) audioCtx = new AudioCtx();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(f, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(f * 0.5, audioCtx.currentTime + d);
+                g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d);
+                osc.connect(g);
+                g.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + d);
+            } catch (e) { }
+        }
+
+        /* =========================================================
+           LOAD EXERCISE
+           ========================================================= */
+        function loadExercise(index) {
+            currentExerciseIndex = index;
+            userAnswers = {};
+            openDropdownIdx = -1;
+            isEvaluated = false;
+            blankMeta = [];
+
+            closeAllDropdowns();
+
+            const ex = DATASET[index];
+            document.getElementById('practiceTitle').textContent = ex.title;
+            document.getElementById('topicBreadcrumb').textContent = ex.breadcrumbTopic || `Topic ${index + 1}`;
+            document.getElementById('setIndexBadge').textContent = `Set ${index + 1} / ${DATASET.length}`;
+            document.getElementById('nextBtnText').textContent = 'Next >';
+
+            renderQuestions(ex);
+            updateProgress();
+        }
+
+        /* =========================================================
+           RENDER ALL QUESTIONS (DIRECT SELECT DROPDOWNS)
+           ========================================================= */
+        function renderQuestions(ex) {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            let gBlankIdx = 0;
+
+            if (ex.type === 'grouped_sentences') {
+                ex.groups.forEach((grp, grpIdx) => {
+                    const section = document.createElement('div');
+                    section.className = 'q-section';
+
+                    const heading = document.createElement('div');
+                    heading.className = 'q-header';
+                    heading.textContent = grp.heading;
+                    section.appendChild(heading);
+
+                    const bullets = document.createElement('div');
+                    bullets.className = 'q-bullets';
+
+                    grp.sentences.forEach((sentence) => {
+                        const row = document.createElement('div');
+                        row.className = 'bullet-row';
+
+                        const dot = document.createElement('span');
+                        dot.className = 'bullet-dot';
+                        dot.textContent = '•';
+
+                        const textWrap = document.createElement('div');
+                        textWrap.className = 'bullet-text';
+
+                        const parts = sentence.split('$select$');
+                        parts.forEach((p, pIdx) => {
+                            textWrap.appendChild(document.createTextNode(p));
+                            if (pIdx < parts.length - 1) {
+                                const bIdx = gBlankIdx++;
+                                blankMeta.push({
+                                    index: bIdx,
+                                    options: grp.options,
+                                    expected: grp.answers[pIdx] || grp.answers[0]
+                                });
+                                textWrap.appendChild(createDropdownComponent(bIdx));
+                            }
+                        });
+
+                        row.appendChild(dot);
+                        row.appendChild(textWrap);
+                        bullets.appendChild(row);
+                    });
+
+                    section.appendChild(bullets);
+                    container.appendChild(section);
+                });
+            } else {
+                // Passage Mode
+                const section = document.createElement('div');
+                section.className = 'q-section';
+
+                const heading = document.createElement('div');
+                heading.className = 'q-header';
+                heading.textContent = ex.instructions || '1. Read the passage and complete the sentences.';
+                section.appendChild(heading);
+
+                const bullets = document.createElement('div');
+                bullets.className = 'q-bullets';
+
+                const row = document.createElement('div');
+                row.className = 'bullet-row';
+
+                const dot = document.createElement('span');
+                dot.className = 'bullet-dot';
+                dot.textContent = '•';
+
+                const textWrap = document.createElement('div');
+                textWrap.className = 'bullet-text';
+
+                const parts = ex.text.split('$select$');
+                parts.forEach((p, pIdx) => {
+                    textWrap.appendChild(document.createTextNode(p));
+                    if (pIdx < parts.length - 1) {
+                        const bIdx = gBlankIdx++;
+                        blankMeta.push({
+                            index: bIdx,
+                            options: ex.options,
+                            expected: ex.correct_options[bIdx]
+                        });
+                        textWrap.appendChild(createDropdownComponent(bIdx));
+                    }
+                });
+
+                row.appendChild(dot);
+                row.appendChild(textWrap);
+                bullets.appendChild(row);
+                section.appendChild(bullets);
+                container.appendChild(section);
+            }
+        }
+
+        /* =========================================================
+           CREATE INLINE SELECT DROPDOWN COMPONENT
+           ========================================================= */
+        function createDropdownComponent(idx) {
+            const container = document.createElement('span');
+            container.className = 'inline-dropdown-container';
+            container.id = `dropdown-container-${idx}`;
+
+            // Dropdown Trigger Pill (Matching Screenshot)
+            const trigger = document.createElement('span');
+            trigger.className = 'dropdown-trigger';
+            trigger.id = `trigger-${idx}`;
+            trigger.innerHTML = `<span class="trigger-label">Select answer</span><span class="dropdown-caret">˅</span>`;
+
+            // Dropdown Menu (Attached directly below this select dropdown)
+            const menu = document.createElement('div');
+            menu.className = 'dropdown-menu';
+            menu.id = `menu-${idx}`;
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleDropdown(idx);
+            });
+
+            container.appendChild(trigger);
+            container.appendChild(menu);
+            return container;
+        }
+
+        /* =========================================================
+           DROPDOWN INTERACTION & UNIQUE AUTO-HIDING
+           ========================================================= */
+        function toggleDropdown(idx) {
+            if (isEvaluated) return;
+            playSnd(500, 'sine', 0.05);
+
+            if (openDropdownIdx === idx) {
+                closeAllDropdowns();
+                return;
+            }
+
+            closeAllDropdowns();
+            openDropdownIdx = idx;
+
+            const trigger = document.getElementById(`trigger-${idx}`);
+            const menu = document.getElementById(`menu-${idx}`);
+            if (!trigger || !menu) return;
+
+            trigger.classList.add('open');
+            menu.innerHTML = '';
+
+            const meta = blankMeta[idx];
+            const usedWords = Object.values(userAnswers);
+
+            // Header row inside dropdown menu
+            const header = document.createElement('div');
+            header.className = 'dropdown-menu-header';
+            header.innerHTML = `<span>Select option:</span><span>Unique</span>`;
+            menu.appendChild(header);
+
+            let availableCount = 0;
+            meta.options.forEach((word) => {
+                // Enforce uniqueness: Hide option if already selected in ANY other blank!
+                if (usedWords.includes(word) && userAnswers[idx] !== word) {
+                    return;
+                }
+
+                availableCount++;
+                const item = document.createElement('button');
+                const isCurrent = userAnswers[idx] === word;
+                item.className = `dropdown-item ${isCurrent ? 'selected' : ''}`;
+                item.innerHTML = `<span>${word}</span>${isCurrent ? '<span>✓</span>' : ''}`;
+
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectOption(idx, word);
+                });
+
+                menu.appendChild(item);
+            });
+
+            // Clear option if already has a value
+            if (userAnswers[idx]) {
+                const resetItem = document.createElement('button');
+                resetItem.className = 'dropdown-item dropdown-item-reset';
+                resetItem.innerHTML = `<span>Remove answer</span><span>✕</span>`;
+                resetItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    clearOption(idx);
+                });
+                menu.appendChild(resetItem);
+            }
+
+            menu.classList.add('active');
+
+            // Adjust positioning if too close to right edge of viewport
+            const rect = trigger.getBoundingClientRect();
+            const menuWidth = 200;
+            if (rect.left + menuWidth > window.innerWidth - 12) {
+                menu.style.left = 'auto';
+                menu.style.right = '0';
+            } else {
+                menu.style.left = '0';
+                menu.style.right = 'auto';
+            }
+        }
+
+        function selectOption(idx, word) {
+            playSnd(660, 'triangle', 0.08);
+
+            // Unique rule: If this word was in another dropdown, clear it
+            Object.keys(userAnswers).forEach(k => {
+                if (userAnswers[k] === word) {
+                    delete userAnswers[k];
+                    updateTriggerUI(parseInt(k, 10));
+                }
+            });
+
+            userAnswers[idx] = word;
+            updateTriggerUI(idx);
+            closeAllDropdowns();
+            updateProgress();
+        }
+
+        function clearOption(idx) {
+            playSnd(360, 'sine', 0.07);
+            delete userAnswers[idx];
+            updateTriggerUI(idx);
+            closeAllDropdowns();
+            updateProgress();
+        }
+
+        function updateTriggerUI(idx) {
+            const trigger = document.getElementById(`trigger-${idx}`);
+            if (!trigger) return;
+
+            const val = userAnswers[idx];
+            if (val) {
+                trigger.className = 'dropdown-trigger filled';
+                trigger.innerHTML = `<span class="trigger-label">${val}</span><span class="dropdown-clear-btn" onclick="event.stopPropagation(); clearOption(${idx})" title="Clear">✕</span>`;
+            } else {
+                trigger.className = 'dropdown-trigger';
+                trigger.innerHTML = `<span class="trigger-label">Select answer</span><span class="dropdown-caret">˅</span>`;
+            }
+        }
+
+        function closeAllDropdowns() {
+            openDropdownIdx = -1;
+            document.querySelectorAll('.dropdown-trigger').forEach(t => t.classList.remove('open'));
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('active'));
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.inline-dropdown-container')) {
+                closeAllDropdowns();
+            }
+        });
+
+        /* =========================================================
+           PROGRESS & EVALUATION
+           ========================================================= */
+        function updateProgress() {
+            const total = blankMeta.length;
+            const filled = Object.keys(userAnswers).length;
+            const pct = Math.round((filled / total) * 100);
+
+            document.getElementById('headerProgressFill').style.width = `${Math.max(15, pct)}%`;
+
+            const nextBtnText = document.getElementById('nextBtnText');
+            if (filled === total && !isEvaluated) {
+                nextBtnText.textContent = 'Check ✓';
+            } else if (isEvaluated) {
+                nextBtnText.textContent = 'Next >';
+            } else {
+                nextBtnText.textContent = 'Next >';
+            }
+        }
+
+        function onNextClick() {
+            const total = blankMeta.length;
+            const filled = Object.keys(userAnswers).length;
+
+            if (!isEvaluated) {
+                if (filled < total) {
+                    // Open the first unfilled dropdown
+                    for (let i = 0; i < total; i++) {
+                        if (!userAnswers[i]) {
+                            toggleDropdown(i);
+                            const trigger = document.getElementById(`trigger-${i}`);
+                            if (trigger) trigger.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            break;
+                        }
+                    }
+                    return;
+                }
+
+                // Validate
+                isEvaluated = true;
+                closeAllDropdowns();
+                let ok = 0;
+                for (let i = 0; i < total; i++) {
+                    const trigger = document.getElementById(`trigger-${i}`);
+                    const userVal = (userAnswers[i] || '').trim().toLowerCase();
+                    const expectedVal = (blankMeta[i].expected || '').trim().toLowerCase();
+
+                    if (trigger) {
+                        if (userVal === expectedVal) {
+                            trigger.classList.add('correct');
+                            trigger.classList.remove('incorrect');
+                            ok++;
+                        } else {
+                            trigger.classList.add('incorrect');
+                            trigger.classList.remove('correct');
+                            trigger.title = `Correct: ${blankMeta[i].expected}`;
+                        }
+                    }
+                }
+
+                if (ok === total) {
+                    playSnd(880, 'triangle', 0.2);
+                    launchConfetti();
+                } else {
+                    playSnd(300, 'sawtooth', 0.25);
+                }
+
+                document.getElementById('nextBtnText').textContent = 'Next >';
+                return;
+            }
+
+            // Next exercise
+            const nextIdx = (currentExerciseIndex + 1) % DATASET.length;
+            loadExercise(nextIdx);
+        }
+
+        function onPrevClick() {
+            if (isEvaluated) {
+                loadExercise(currentExerciseIndex);
+            } else {
+                const prevIdx = (currentExerciseIndex - 1 + DATASET.length) % DATASET.length;
+                loadExercise(prevIdx);
+            }
+        }
+
+        /* =========================================================
+           MODAL FOR EXERCISE PICKER
+           ========================================================= */
+        function openExerciseModal() {
+            const list = document.getElementById('modalItemsList');
+            list.innerHTML = '';
+
+            DATASET.forEach((ex, idx) => {
+                const row = document.createElement('div');
+                row.className = `modal-exercise-row ${idx === currentExerciseIndex ? 'active' : ''}`;
+                row.innerHTML = `
+          <div>
+            <div class="modal-ex-name">${ex.title}</div>
+            <div class="modal-ex-info">${ex.type === 'passage' ? 'Passage' : 'Grammar Groups'} · Direct Dropdowns</div>
+          </div>
+          <span style="color: var(--link-blue); font-weight: 700;">Open &gt;</span>
+        `;
+                row.addEventListener('click', () => {
+                    loadExercise(idx);
+                    closeExerciseModal();
+                });
+                list.appendChild(row);
+            });
+
+            document.getElementById('exerciseModal').classList.add('open');
+        }
+
+        function closeExerciseModal(e) {
+            if (e && e.target !== document.getElementById('exerciseModal') && !e.target.closest('.modal-close-btn')) {
+                return;
+            }
+            document.getElementById('exerciseModal').classList.remove('open');
+        }
+
+        /* =========================================================
+           CONFETTI
+           ========================================================= */
+        function launchConfetti() {
+            const colors = ['#f16521', '#0a74ba', '#42b883', '#5ca5e6', '#fbbf24'];
+            for (let i = 0; i < 35; i++) {
+                const p = document.createElement('div');
+                p.className = 'confetti-particle';
+                const size = Math.random() * 8 + 6;
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                p.style.left = `${Math.random() * 100}vw`;
+                p.style.top = '-10px';
+                p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 2500);
+            }
+        }
+
+        /* =========================================================
+           INIT
+           ========================================================= */
+        window.addEventListener('DOMContentLoaded', () => {
+            loadExercise(0);
+        });
+    </script>
+</body>
+
+</html>
