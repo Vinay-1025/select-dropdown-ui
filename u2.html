@@ -486,6 +486,28 @@
       text-align: center;
     }
 
+    /* Floating Drag Avatar for Mobile Touch & Mouse */
+    #dragGhostAvatar {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      display: none;
+      transform: translate(-50%, -50%);
+      background: var(--btn-blue);
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      user-select: none;
+      -webkit-user-select: none;
+      white-space: nowrap;
+      will-change: left, top;
+    }
+
     /* ====== BOTTOM ACTION BUTTONS (Exact Screenshot Match) ====== */
     .bottom-cta-bar {
       position: fixed;
@@ -1193,21 +1215,99 @@
         availableCount++;
         const chip = document.createElement('button');
         chip.className = 'word-chip';
-        chip.setAttribute('draggable', 'true');
+        chip.setAttribute('type', 'button');
         chip.innerHTML = `<span class="chip-key">${availableCount}</span><span>${opt}</span>`;
 
-        chip.addEventListener('click', () => {
-          assignWord(activeGlobalBlank, opt);
-        });
+        // Prevent native HTML5 drag interference so pointer events take full control on mobile & desktop
+        chip.addEventListener('dragstart', (e) => e.preventDefault());
 
-        chip.addEventListener('dragstart', (e) => {
-          chip.classList.add('dragging');
-          e.dataTransfer.setData('text/plain', opt);
-        });
+        // Mobile Touch & Pointer Drag and Tap Handler
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        const dragGhost = document.getElementById('dragGhostAvatar');
 
-        chip.addEventListener('dragend', () => {
-          chip.classList.remove('dragging');
-        });
+        function onPointerDown(e) {
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
+          if (isEvaluated) return;
+
+          startX = e.clientX;
+          startY = e.clientY;
+          isDragging = false;
+
+          try {
+            chip.setPointerCapture(e.pointerId);
+          } catch (err) {}
+
+          function onPointerMove(moveEvent) {
+            const dx = moveEvent.clientX - startX;
+            const dy = moveEvent.clientY - startY;
+
+            // 5px threshold to separate quick tap from drag
+            if (!isDragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+              isDragging = true;
+              chip.classList.add('dragging');
+              playSnd(520, 'sine', 0.05);
+
+              if (dragGhost) {
+                dragGhost.textContent = opt;
+                dragGhost.style.display = 'block';
+                dragGhost.style.left = `${moveEvent.clientX}px`;
+                dragGhost.style.top = `${moveEvent.clientY}px`;
+              }
+            }
+
+            if (isDragging && dragGhost) {
+              dragGhost.style.left = `${moveEvent.clientX}px`;
+              dragGhost.style.top = `${moveEvent.clientY}px`;
+
+              // Detect slot under finger/pointer
+              const elBelow = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
+              const dropSlot = elBelow ? elBelow.closest('.select-slot') : null;
+
+              document.querySelectorAll('.select-slot').forEach(s => s.classList.remove('drag-target'));
+              if (dropSlot) {
+                dropSlot.classList.add('drag-target');
+              }
+            }
+          }
+
+          function onPointerUp(upEvent) {
+            try {
+              chip.releasePointerCapture(upEvent.pointerId);
+            } catch (err) {}
+
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+            window.removeEventListener('pointercancel', onPointerUp);
+
+            chip.classList.remove('dragging');
+            if (dragGhost) dragGhost.style.display = 'none';
+            document.querySelectorAll('.select-slot').forEach(s => s.classList.remove('drag-target'));
+
+            if (isDragging) {
+              isDragging = false;
+              const elBelow = document.elementFromPoint(upEvent.clientX, upEvent.clientY);
+              const dropSlot = elBelow ? elBelow.closest('.select-slot') : null;
+
+              if (dropSlot) {
+                const targetIdx = parseInt(dropSlot.getAttribute('data-index'), 10);
+                assignWord(targetIdx, opt);
+              } else {
+                playSnd(280, 'sine', 0.07);
+              }
+            } else {
+              // Quick tap: Assign directly to the active focused slot
+              assignWord(activeGlobalBlank, opt);
+            }
+          }
+
+          window.addEventListener('pointermove', onPointerMove);
+          window.addEventListener('pointerup', onPointerUp);
+          window.addEventListener('pointercancel', onPointerUp);
+        }
+
+        chip.addEventListener('pointerdown', onPointerDown);
 
         chipsContainer.appendChild(chip);
       });
@@ -1526,6 +1626,9 @@
       loadExercise(0);
     });
   </script>
+
+  <!-- Mobile Touch & Pointer Drag Avatar -->
+  <div id="dragGhostAvatar"></div>
 </body>
 
 </html>
