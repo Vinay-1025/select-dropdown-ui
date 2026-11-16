@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Fluen UI Showcase — Video & Active Variant Side-by-Side</title>
+  <meta name="description"
+    content="Compare the reference video (original.mp4) side-by-side with the active UI variation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg-hub: #121316;
+      --bg-sidebar: #1a1b1f;
+      --bg-sidebar-hover: #26272e;
+      --bg-card: #202227;
+      --bg-active-tab: #0a74ba;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(92, 165, 230, 0.4);
+      --text-main: #ffffff;
+      --text-muted: #9499a6;
+      --btn-orange: #f16521;
+      --btn-blue: #0a74ba;
+      --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      font-family: var(--font);
+      background-color: var(--bg-hub);
+      color: var(--text-main);
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* ====== 1. LEFT SIDEBAR ====== */
+    .sidebar {
+      width: 280px;
+      height: 100%;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sidebar-header {
+      padding: 16px 18px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5px;
+      padding: 3.5px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 9px;
+      flex-shrink: 0;
+    }
+
+    .brand-logo span {
+      border-radius: 2px;
+    }
+
+    .brand-logo .c-orange { background: #f26522; }
+    .brand-logo .c-green { background: #42b883; }
+    .brand-logo .c-red { background: #ea580c; }
+    .brand-logo .c-blue { background: #00aeef; }
+
+    .brand-titles {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 15.5px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .sidebar-menu-wrap {
+      flex: 1;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+    }
+
+    .menu-category-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 6px 8px 2px;
+    }
+
+    /* 3 Sidebar Navigation Options (Exact Requested Names) */
+    .sidebar-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .sidebar-item:hover {
+      background: var(--bg-sidebar-hover);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateX(2px);
+    }
+
+    .sidebar-item.active {
+      background: var(--bg-active-tab);
+      border-color: #38bdf8;
+      box-shadow: 0 4px 14px rgba(10, 116, 186, 0.45);
+      transform: translateX(3px);
+    }
+
+    .item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .item-title {
+      font-family: var(--font);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .item-indicator {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .sidebar-item.active .item-indicator {
+      background: #34d399;
+      box-shadow: 0 0 8px #34d399;
+    }
+
+    .item-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    .sidebar-item.active .item-desc {
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    /* Sidebar Footer */
+    .sidebar-footer {
+      padding: 14px 14px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .footer-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    /* ====== 2. MAIN VIEWPORT (CONTAINS VIDEO + ACTIVE VARIANT) ====== */
+    .main-viewport {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      background: #121316;
+    }
+
+    /* Floating Hamburger for Mobile Viewport */
+    .floating-menu-btn {
+      display: none;
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 50;
+      background: rgba(26, 27, 31, 0.9);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      color: #ffffff;
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      transition: background 0.15s;
+    }
+
+    .floating-menu-btn:hover {
+      background: rgba(40, 42, 49, 0.95);
+    }
+
+    /* ====== 3. TWO COLUMNS SIDE BY SIDE (VIDEO + ACTIVE VARIANT) ====== */
+    .dual-canvas {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 18px 24px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      background: #121316;
+    }
+
+    /* Phone Mockup Container */
+    .mockup-card {
+      width: 420px;
+      max-width: 440px;
+      height: 100%;
+      max-height: 900px;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+      position: relative;
+      flex-shrink: 0;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .mockup-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Card Body Area (Full Height Mobile Frame) */
+    .card-body {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #26272b;
+      overflow: hidden;
+      border-radius: 16px;
+    }
+
+    /* Video Player Area */
+    .video-viewport {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #000000;
+      position: relative;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-viewport video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    /* Video Overlay Bar */
+    .video-bar-overlay {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      background: rgba(18, 19, 22, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 5;
+    }
+
+    .vid-ctrl-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 5px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s;
+    }
+
+    .vid-ctrl-btn:hover {
+      background: var(--bg-active-tab);
+    }
+
+    .vid-time {
+      font-size: 11px;
+      color: #9499a6;
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    /* Active Variant Iframe Viewport */
+    .card-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #26272b;
+    }
+
+    /* Iframe Loading Spinner */
+    .loader-overlay {
+      position: absolute;
+      inset: 0;
+      background: #26272b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 10;
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(255, 255, 255, 0.15);
+      border-top-color: var(--bg-active-tab);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ====== RESPONSIVE LAYOUT FOR MOBILE / SMALLER SCREENS ====== */
+    @media (max-width: 960px) {
+      .floating-menu-btn {
+        display: flex;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(4px);
+        z-index: 90;
+        display: none;
+      }
+
+      .sidebar-backdrop.show {
+        display: block;
+      }
+
+      .dual-canvas {
+        justify-content: flex-start;
+        padding: 12px 14px 16px;
+        gap: 14px;
+      }
+
+      .mockup-card {
+        width: 340px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Mobile Sidebar Backdrop -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
+  <!-- 1. LEFT SIDEBAR (Contains the 3 Options) -->
+  <aside class="sidebar" id="sidebar">
+    <!-- Brand Header -->
+    <div class="sidebar-header">
+      <div class="brand-logo">
+        <span class="c-orange"></span>
+        <span class="c-green"></span>
+        <span class="c-red"></span>
+        <span class="c-blue"></span>
+      </div>
+      <div class="brand-titles">
+        <span class="brand-title">Fluen UI Portal</span>
+        <span class="brand-subtitle">Benchmark & Variations</span>
+      </div>
+    </div>
+
+    <!-- 3 Sidebar Items -->
+    <div class="sidebar-menu-wrap">
+      <div class="menu-category-title">Select Active Variant</div>
+
+      <!-- 1. select-dropdown-Ui1 -> ui-dropdown.html -->
+      <button class="sidebar-item active" id="btn-ui1"
+        onclick="switchActiveVariant('select-dropdown-Ui1', 'ui-dropdown.html', 'Direct Inline Dropdowns on each slot', this)">
+        <div class="item-header">
+          <span class="item-title">select-dropdown-Ui1</span>
+          <span class="item-indicator"></span>
+        </div>
+        <span class="item-desc">Direct inline dropdowns located right inside each blank slot.</span>
+      </button>
+
+      <!-- 2. select-dropdown-Ui2 -> u2.html -->
+      <button class="sidebar-item" id="btn-ui2"
+        onclick="switchActiveVariant('select-dropdown-Ui2', 'u2.html', 'Tactile Word Dock & [1–9] Keys', this)">
+        <div class="item-header">
+          <span class="item-title">select-dropdown-Ui2</span>
+          <span class="item-indicator"></span>
+        </div>
+        <span class="item-desc">Bottom tactile word dock with [1–9] keyboard accelerators.</span>
+      </button>
+
+      <!-- 3. select-dropdown-Ui3 -> ui-dragdrop-option-sidepanel.html -->
+      <button class="sidebar-item" id="btn-ui3"
+        onclick="switchActiveVariant('select-dropdown-Ui3', 'ui-dragdrop-option-sidepanel.html', 'Left Questions + Right Dynamic Rail', this)">
+        <div class="item-header">
+          <span class="item-title">select-dropdown-Ui3</span>
+          <span class="item-indicator"></span>
+        </div>
+        <span class="item-desc">Mobile view with questions on left and dynamic options rail on right.</span>
+      </button>
+    </div>
+
+    <!-- Sidebar Bottom -->
+    <div class="sidebar-footer">
+      <div class="footer-note">
+        🎬 The video stays fixed next to the sidebar as the visual reference. Click any variant to swap the live test
+        frame.
+      </div>
+    </div>
+  </aside>
+
+  <!-- 2. MAIN VIEWPORT -->
+  <main class="main-viewport">
+    <!-- Floating Hamburger for Mobile Devices Only -->
+    <button class="floating-menu-btn" onclick="openMobileSidebar()" title="Open Navigation Menu">☰</button>
+
+    <!-- TWO COLUMNS SIDE BY SIDE (VIDEO NEXT TO SIDEBAR, THEN ACTIVE VARIANT) -->
+    <section class="dual-canvas">
+
+      <!-- COLUMN 1: VIDEO (NEXT TO SIDEBAR) -->
+      <div class="mockup-card" id="videoCard">
+        <div class="card-body">
+          <div class="video-viewport">
+            <video id="refVideo" src="original.mp4" playsinline loop autoplay muted></video>
+            <div class="video-bar-overlay">
+              <button class="vid-ctrl-btn" id="vidPlayBtn" onclick="toggleMainVideo()">❚❚ Pause</button>
+              <button class="vid-ctrl-btn" id="vidMuteBtn" onclick="toggleMuteVideo()">🔊 Unmute</button>
+              <button class="vid-ctrl-btn" id="vidSpeedBtn" onclick="cycleVideoSpeed()">1.0x</button>
+              <span class="vid-time" id="vidTimeBadge">0:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMN 2: ACTIVE VARIANT (AFTER THE VIDEO) -->
+      <div class="mockup-card" id="variantCard">
+        <div class="card-body">
+          <div class="loader-overlay" id="loaderOverlay" style="display: none; opacity: 0;">
+            <div class="spinner"></div>
+            <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Loading Variant...</span>
+          </div>
+          <iframe id="activeIframe" src="ui-dropdown.html" onload="onFrameLoaded()"></iframe>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    const refVideo = document.getElementById('refVideo');
+    const vidPlayBtn = document.getElementById('vidPlayBtn');
+    const vidMuteBtn = document.getElementById('vidMuteBtn');
+    const vidSpeedBtn = document.getElementById('vidSpeedBtn');
+    const vidTimeBadge = document.getElementById('vidTimeBadge');
+    const activeIframe = document.getElementById('activeIframe');
+    const loaderOverlay = document.getElementById('loaderOverlay');
+
+    let loaderTimer = null;
+
+    // Video Speed Cycle
+    const speeds = [1.0, 1.25, 1.5, 0.75];
+    let speedIndex = 0;
+
+    function cycleVideoSpeed() {
+      speedIndex = (speedIndex + 1) % speeds.length;
+      const speed = speeds[speedIndex];
+      if (refVideo) {
+        refVideo.playbackRate = speed;
+        if (vidSpeedBtn) vidSpeedBtn.textContent = speed + 'x';
+      }
+    }
+
+    // Toggle Play/Pause
+    function toggleMainVideo() {
+      if (!refVideo) return;
+      if (refVideo.paused) {
+        refVideo.play();
+        if (vidPlayBtn) vidPlayBtn.textContent = '❚❚ Pause';
+      } else {
+        refVideo.pause();
+        if (vidPlayBtn) vidPlayBtn.textContent = '▶ Play';
+      }
+    }
+
+    // Toggle Mute
+    function toggleMuteVideo() {
+      if (!refVideo) return;
+      refVideo.muted = !refVideo.muted;
+      if (vidMuteBtn) vidMuteBtn.textContent = refVideo.muted ? '🔇 Muted' : '🔊 Sound On';
+    }
+
+    // Replay Video
+    function restartVideo() {
+      if (!refVideo) return;
+      refVideo.currentTime = 0;
+      refVideo.play();
+      if (vidPlayBtn) vidPlayBtn.textContent = '❚❚ Pause';
+    }
+
+    // Video Time Tracking
+    if (refVideo) {
+      refVideo.addEventListener('timeupdate', () => {
+        const cur = Math.floor(refVideo.currentTime);
+        const dur = Math.floor(refVideo.duration) || 0;
+        const curM = Math.floor(cur / 60);
+        const curS = (cur % 60).toString().padStart(2, '0');
+        const durM = Math.floor(dur / 60);
+        const durS = (dur % 60).toString().padStart(2, '0');
+        if (vidTimeBadge) vidTimeBadge.textContent = `${curM}:${curS} / ${durM}:${durS}`;
+      });
+    }
+
+    // Hide loader safely
+    function hideLoader() {
+      if (loaderTimer) {
+        clearTimeout(loaderTimer);
+        loaderTimer = null;
+      }
+      if (loaderOverlay) {
+        loaderOverlay.style.opacity = '0';
+        setTimeout(() => {
+          if (loaderOverlay) loaderOverlay.style.display = 'none';
+        }, 150);
+      }
+    }
+
+    // On Iframe Loaded
+    function onFrameLoaded() {
+      hideLoader();
+    }
+
+    // Switch Active Variant from Sidebar
+    function switchActiveVariant(uiName, filePath, description, element) {
+      try {
+        // Update Sidebar Active state
+        document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.remove('active'));
+        if (element) element.classList.add('active');
+
+        // Show loader with auto-dismiss safety timeout
+        if (loaderOverlay) {
+          loaderOverlay.style.display = 'flex';
+          loaderOverlay.style.opacity = '1';
+        }
+        if (loaderTimer) clearTimeout(loaderTimer);
+        loaderTimer = setTimeout(hideLoader, 350);
+
+        // Update Iframe Source
+        if (activeIframe) {
+          activeIframe.src = filePath;
+        }
+
+        // Close mobile sidebar if open
+        closeMobileSidebar();
+      } catch (err) {
+        console.error('Error switching variant:', err);
+        hideLoader();
+      }
+    }
+
+    // Reload active iframe
+    function reloadActiveIframe() {
+      if (loaderOverlay) {
+        loaderOverlay.style.display = 'flex';
+        loaderOverlay.style.opacity = '1';
+      }
+      if (loaderTimer) clearTimeout(loaderTimer);
+      loaderTimer = setTimeout(hideLoader, 350);
+
+      if (activeIframe) {
+        activeIframe.src = activeIframe.src;
+      }
+    }
+
+    // Mobile Sidebar
+    function openMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (sidebar) sidebar.classList.add('open');
+      if (backdrop) backdrop.classList.add('show');
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (sidebar) sidebar.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('show');
+    }
+  </script>
+</body>
+
+</html>
